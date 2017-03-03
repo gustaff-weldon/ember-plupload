@@ -134,3 +134,45 @@ test('response headers with numbers are still properly handled by parseResponse'
     'x-some-header-2' : 'abc'
   });
 });
+
+test(".configureUpload should call stop when file is not ready (no settings)", function(assert) {
+  const MockFile = Ember.Object.extend({});
+
+  const uploader = Ember.Object.extend({
+    stopCallCount: 0,
+
+    stop() {
+      this.incrementProperty('stopCallCount');
+    }
+  }).create();
+
+  const fileToUpload1 = {id: 1};
+  const fileToUpload2 = {id: 2};
+  const queue = UploadQueue.create({
+      settings: {}
+  });
+  const file1 = MockFile.create({uploader, queue, file: fileToUpload1});
+  const file2 = MockFile.create({uploader, queue, file: fileToUpload2});
+
+  queue.pushObject(file1);
+  queue.pushObject(file2);
+
+  // configure file that is not ready
+  let result = queue.configureUpload(uploader, file1);
+  assert.equal(uploader.get('stopCallCount'), 1, 'should call upoader.stop for file without settings');
+  assert.equal(result, false, 'should return false to prevent upload');
+
+  // setup file
+  file1.set('settings', {});
+
+  // try again same file, this time configured
+  result = queue.configureUpload(uploader, file1);
+  assert.equal(uploader.get('stopCallCount'), 1, 'should not call upoader.stop for file with settings');
+  assert.equal(result, undefined, 'should not return anything');
+
+  // configure already setup file
+  file2.set('settings', {});
+  result = queue.configureUpload(uploader, file2);
+  assert.equal(uploader.get('stopCallCount'), 1, 'should not call upoader.stop for file with settings');
+  assert.equal(result, undefined, 'should not return anything');
+});

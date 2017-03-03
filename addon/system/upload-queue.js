@@ -167,7 +167,17 @@ export default Ember.ArrayProxy.extend({
   },
 
   configureUpload(uploader, file) {
-    file = this.findBy('id', file.id);
+    file = this.findBy('id', get(file, 'id'));
+
+    if (!file.settings) {
+        // if file is missing settings it means its file.upload has not been called yet
+        // we stop uploader from processing any files, until file will be explicitly uploaded
+        uploader.stop()
+
+        // prevent current file from being uploaded
+        return false
+    }
+
     // Reset settings for merging
     uploader.settings = copy(get(this, 'settings'));
     merge(uploader.settings, file.settings);
@@ -176,7 +186,7 @@ export default Ember.ArrayProxy.extend({
   },
 
   progressDidChange(uploader, file) {
-    file = this.findBy('id', file.id);
+    file = this.findBy('id', get(file, 'id'));
     if (file) {
       file.notifyPropertyChange('progress');
     }

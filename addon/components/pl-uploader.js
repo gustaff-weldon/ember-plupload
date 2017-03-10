@@ -61,6 +61,7 @@ export default Ember.Component.extend({
   'no-duplicates': false,
 
   multiple: true,
+  'use-dnd': true,
   'unique-names': false,
   'send-browser-cookies': false,
   'send-file-name': null,
@@ -71,7 +72,7 @@ export default Ember.Component.extend({
       var id = get(this, 'for-dropzone') || 'dropzone-for-' + get(this, 'elementId');
       dropzone.enabled = false;
 
-      if (isDragAndDropSupported(get(this, 'runtimes'))) {
+      if (get(this, 'use-dnd') && isDragAndDropSupported(get(this, 'runtimes'))) {
         dropzone.enabled = true;
         dropzone.id = id;
         dropzone.data = null;
@@ -119,7 +120,7 @@ export default Ember.Component.extend({
         }
       });
 
-      if (isDragAndDropSupported(get(this, 'runtimes'))) {
+      if (get(this, 'use-dnd') && isDragAndDropSupported(get(this, 'runtimes'))) {
         config.drop_element = get(this, 'dropzone.id');
       }
 
@@ -241,7 +242,7 @@ export default Ember.Component.extend({
   },
 
   setDragDataValidity: Ember.observer('dragData', Ember.on('init', function () {
-    if (!isDragAndDropSupported(get(this, 'runtimes'))) { return; }
+    if (!get(this, 'use-dnd') || !isDragAndDropSupported(get(this, 'runtimes'))) { return; }
 
     var data = get(this, 'dragData');
     var extensions = get(this, 'extensions');

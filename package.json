@@ -1,6 +1,6 @@
 {
   "name": "ember-plupload",
-  "version": "1.13.21-bz",
+  "version": "1.13.22-bz",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -46,6 +46,7 @@
     "rsvp": "^3.0.17"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "defaultBlueprint": "ember-plupload"
   }
 }
